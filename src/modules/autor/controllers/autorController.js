@@ -1,13 +1,13 @@
-const { Curso } = require("../../index");
-class CursoController {
+const { Autor } = require("../../index");
+class AutorController {
   static async criar(req, res) {
     try {
-      const { cod_curso, nome } = req.body;
-      if (cod_curso && nome) {
-        const curso = await Curso.create({ cod_curso, nome });
+      const { cod_autor, nome_autor, titulo_livro, genero, ano_publicacao } = req.body;
+      if (cod_autor && nome_autor && titulo_livro && genero && ano_publicacao) {
+        const autor = await Autor.create({ cod_autor, nome_autor, titulo_livro, genero, ano_publicacao });
         res
           .status(201)
-          .json({ mensagem: "Curso cadastrado com sucesso", curso });
+          .json({ mensagem: "Autor cadastrado com sucesso", nome_autor });
       } else {
         res
           .status(400)
@@ -20,20 +20,23 @@ class CursoController {
 
   static async listar(req, res) {
     try {
-      const cursos = await Curso.findAll();
+      const autores = await Autor.findAll();
 
-      if (cursos.length > 0) {
-        return res.status(200).json(cursos);
+      if (autores.length > 0) {
+        return res.status(200).json(autores);
       }
-      res.status(200).json({ mensagem: "Nenhum curso encontrado" });
+      res.status(200).json({ mensagem: "Nenhum  encontrado" });
     } catch (error) {
       res.status(500).json({ erro: error.message });
     }
   }
   static async atualizar(req, res) {
     try {
-      const cod_curso = req.params.cod_curso;
-      const { nome } = req.body;
+      const cod_autor = req.params.cod_autor;
+      const { nome_autor, titulo_livro, genero, ano_publicacao } = req.body;
+       if (!cod_autor) {
+        return res.status(400).json({ mensagem: "cod_autor é obrigatório na URL" });
+      }
       if (cod_curso && nome) {
         const [atualizado] = await Curso.update(
           { nome },
@@ -58,20 +61,64 @@ class CursoController {
     }
   }
 
-  static async deletar(req, res) {
+static async atualizar(req, res) {
     try {
-      const { cod_curso } = req.params;
-      const curso = await Curso.findByPk(cod_curso);
+      const { cod_autor } = req.pa
 
-      if (!curso) {
-        return res.status(404).json({ mensagem: "Curso não encontrado." });
+            // Monta só os campos enviados (parcial)
+      const dados = {};
+      if (typeof nome_autor !== 'undefined') dados.nome_autor = nome_autor;
+      if (typeof titulo_livro !== 'undefined') dados.titulo_livro = titulo_livro;
+      if (typeof genero !== 'undefined') dados.genero = genero;
+      if (typeof ano_publicacao !== 'undefined') dados.ano_publicacao = ano_publicacao;
+
+      if (Object.keys(dados).length === 0) {
+        return res.status(400).json({ mensagem: "Nada para atualizar" });
       }
 
-      await curso.destroy();
-      res.status(200).json({ mensagem: "Curso deletado com sucesso!", curso: curso });
+      const [qtde] = await AutorModel.update(dados, { where: { cod_autor } });
+
+      if (qtde === 0) {
+        return res.status(404).json({ mensagem: "Autor não encontrado ou não alterado" });
+      }
+
+      const autor = await AutorModel.findByPk(cod_autor);
+      return res.status(200).json({
+        mensagem: "Autor atualizado com sucesso",
+        autor: {
+          cod_autor: autor.cod_autor,
+          nome_autor: autor.nome_autor,
+          titulo_livro: autor.titulo_livro,
+          genero: autor.genero,
+          ano_publicacao: autor.ano_publicacao,
+          atualizado_em: autor.atualizado_em
+        }
+      });
+    } catch (error) {
+      // ENUM inválido, validação, etc., caem aqui
+      return res.status(500).json({ erro: error.message });
+    }
+  }
+
+
+
+
+
+
+  static async deletar(req, res) {
+    try {
+      const { cod_autor } = req.params;
+      const autor = await Curso.findByPk(cod_autor);
+
+      if (!autor) {
+        return res.status(404).json({ mensagem: "Autor não encontrado." });
+      }
+
+      await autor.destroy();
+      res.status(200).json({ mensagem: "Autor deletado com sucesso!", Autor: nome_autor });
     } catch (error) {
       res.status(500).json({ erro: error.message });
     }
   }
 }
-module.exports = CursoController;
+module.exports = AutorController;

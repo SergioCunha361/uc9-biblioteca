@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../../../config/configDB');
 
-const CursoModel = sequelize.define('Curso', {
+const AutorModel = sequelize.define('Autor', {
 
-    cod_curso: {
+    cod_autor: {
         type: DataTypes.STRING(4),
         allowNull: false,
         primaryKey: true,
@@ -14,17 +14,42 @@ const CursoModel = sequelize.define('Curso', {
             }
         }
     },
-    nome: {
+    nome_autor: {
         type: DataTypes.STRING(100),
         allowNull: false
+    },
+    titulo_livro: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+    genero: {
+    type: DataTypes.ENUM(
+      'Romance',
+      'Ficção',
+      'Fantasia',
+      'Terror',
+      'Suspense',
+      'Biografia',
+      'História',
+      'Ciência'
+    ),
+    allowNull: false,
+    defaultValue: 'Romance', // gênero padrão caso não informe
+    },
+    ano_publicacao: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
     }
-},
+    },
     {
-        tableName: 'curso',
+        tableName: 'autor',
         createdAt: 'criado_em',
         updatedAt: 'atualizado_em'
     },
 
 )
 
-module.exports = CursoModel;
+module.exports = AutorModel;
+
+
+
